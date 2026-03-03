@@ -1,0 +1,46 @@
+name: Veracode Fix for SCA
+
+on:
+  repository_dispatch:
+    types: 
+      - veracode-fix-for-sca
+
+jobs:
+
+  fix-for-sca-action:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download SCA scan artifact
+      uses: actions/download-artifact@v5
+      with:
+        github-token: ${{ secrets.PAT }}
+        run-id: ${{ github.event.client_payload.workflow_run_id }}
+        artifact-ids: ${{ github.event.client_payload.artifact_id }}
+
+    - uses: actions/checkout@v4
+      with:
+        repository: ${{ github.event.client_payload.repository.full_name }}
+        ref: ${{ env.SOURCE_BRANCH }}
+        token: ${{ github.event.client_payload.token }}
+        path: 'source-code'
+
+    - id: run-fix-sca
+      uses: tech-r-us-qa/fix-sca-action-js@main
+      env:
+          FIX_SCA_BACKEND_URL: 'api-agora-stage-107.stage.veracode.io'
+      with:
+        github-token: ${{ secrets.PAT }}
+        vid: ${{ secrets.VERACODE_API_ID }}
+        vkey: ${{ secrets.VERACODE_API_KEY }}
+
+        pr-number: ${{ github.event.client_payload.issue_number }} 
+        sca-scan-run-id: ${{ github.event.client_payload.workflow_run_id }} 
+        sca-scan-artifact-id: ${{ github.event.client_payload.artifact_id }} 
+        repository: ${{ github.event.client_payload.repository.full_name }}
+        branch: ${{ github.event.client_payload.repository.branch }} 
+        client-payload-token: ${{ github.event.client_payload.token }} 
+        fix-sca-params: ${{ github.event.client_payload.fix_sca_params }} 
+
+        github-api-url: ${{ github.api_url }} 
+
+

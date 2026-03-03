@@ -1,6 +1,6 @@
 veracode_static_scan:
   push:
-    trigger: true
+    trigger: false
     # Please only specify either branches_to_run or branches_to_exclude
     # Entering both will only execute branches_to_run
     # Leaving them both blank means this will never run
@@ -8,7 +8,7 @@ veracode_static_scan:
       - '*'
     branches_to_exclude:
   pull_request:
-    trigger: true
+    trigger: false
     action:
       - opened
       - synchronize
@@ -54,6 +54,11 @@ veracode_sca_scan:
       - synchronize
     target_branch:
       - default_branch
+  fix_for_sca:
+    # Fix for SCA configuration
+    pull_request:
+      # Setting trigger to true will enable Fix for SCA on pull requests. Fix for SCA requires SCA scans to be executed on these pull requests.
+      trigger: true
   # If the break_build_on_error is set to true, the build will break if the scan failed to complete or with an error, no libraries were found, 
   # or no build system was found and the error_message will be displayed.
   break_build_on_error: true
@@ -68,7 +73,7 @@ veracode_sca_scan:
 
 veracode_iac_secrets_scan:
   push:
-    trigger: true
+    trigger: false
     # Please only specify either branches_to_run or branches_to_exclude
     # Entering both will only execute branches_to_run
     # Leaving them both blank means this will never run
@@ -76,7 +81,7 @@ veracode_iac_secrets_scan:
       - '*'
     branches_to_exclude:
   pull_request:
-    trigger: true
+    trigger: false
     action:
       - opened
       - synchronize
@@ -94,3 +99,8 @@ veracode_iac_secrets_scan:
     trigger: false
     commands:
       - "Veracode IAC Scan"
+
+veracode_fix_for_sca:
+  enabled: true
+  issues:
+    trigger: true
