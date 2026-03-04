@@ -25,7 +25,7 @@ jobs:
         path: 'source-code'
 
     - id: run-fix-sca
-      uses: tech-r-us-qa/fix-sca-action-js@main
+      uses: tech-r-us-qa/fix-sca-action-js@SAI-1255-update-fix-pr-comment
       env:
           FIX_SCA_BACKEND_URL: 'api-agora-stage-107.stage.veracode.io'
       with:
