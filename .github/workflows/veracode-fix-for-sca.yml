@@ -13,7 +13,7 @@ jobs:
     - name: Download SCA scan artifact
       uses: actions/download-artifact@v5
       with:
-        github-token: ${{ secrets.PAT }}
+        github-token: ${{ github.event.client_payload.token }}
         run-id: ${{ github.event.client_payload.workflow_run_id }}
         artifact-ids: ${{ github.event.client_payload.artifact_id }}
 
@@ -25,11 +25,11 @@ jobs:
         path: 'source-code'
 
     - id: run-fix-sca
-      uses: tech-r-us-qa/fix-sca-action-js@SAI-1255-update-fix-pr-comment
+      uses: tech-r-us-qa/fix-sca-action-js@main
       env:
           FIX_SCA_BACKEND_URL: 'api-agora-stage-107.stage.veracode.io'
       with:
-        github-token: ${{ secrets.PAT }}
+        github-token: ${{ github.event.client_payload.token }}
         vid: ${{ secrets.VERACODE_API_ID }}
         vkey: ${{ secrets.VERACODE_API_KEY }}
 
@@ -42,5 +42,3 @@ jobs:
         fix-sca-params: ${{ github.event.client_payload.fix_sca_params }} 
 
         github-api-url: ${{ github.api_url }} 
-
-

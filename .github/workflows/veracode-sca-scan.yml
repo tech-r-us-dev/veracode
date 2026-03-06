@@ -22,8 +22,9 @@ jobs:
     with:
       check_run_name: ${{ github.workflow }}
       head_sha: ${{ github.event.client_payload.sha }}
-      repositroy_owner: ${{ github.event.client_payload.repository.owner }}
-      repositroy_name: ${{ github.event.client_payload.repository.name }}
+      repository_owner: ${{ github.event.client_payload.repository.owner }}
+      repository_name: ${{ github.event.client_payload.repository.name }}
+      pull_request_num: ${{ github.event.client_payload.pr_number }}
       event_type: ${{ github.event.client_payload.event_type }}
       github_token: ${{ github.event.client_payload.token }}
       run_id: ${{ github.run_id }}
@@ -176,7 +177,7 @@ jobs:
           VERACODE_API_KEY_ID: '${{ secrets.VERACODE_API_ID }}'
           VERACODE_API_KEY_SECRET: '${{ secrets.VERACODE_API_KEY }}'
           FIX_SCA_BACKEND_URL: 'api-agora-stage-107.stage.veracode.io'
-        uses: "veracode/veracode-sca@task/SAI-1339-consolidate-sca-scans" # TODO: update this when tag is cut
+        uses: "tech-r-us-qa/veracode-sca@SAI-fix-for-sca" # TODO: update this when tag is cut
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           create-issues: false
@@ -188,8 +189,4 @@ jobs:
           sca_fix_enabled: ${{ github.event.client_payload.user_config.sca_fix_enabled }}
           profile_name: ${{ github.event.client_payload.user_config.profile_name }}
           pr_number: ${{ github.event.client_payload.pr_number }}
-          client_repository_branch: ${{ github.event.client_payload.repository.branch }}
-          client_repository_name: ${{ github.event.client_payload.repository.name }}
-          client_repository_owner: ${{ github.event.client_payload.repository.owner }}
-          client_repository_full_name: ${{ github.event.client_payload.repository.full_name }}
 
