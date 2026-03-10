@@ -42,6 +42,7 @@ jobs:
         path: 'veracode-helper'
 
     - name: Set up CLI
+      id: cli-setup
       run: |
         cd veracode-helper/helper/cli
         cliFile=$(ls -1 *.tar.gz | head -n 1)
@@ -52,6 +53,7 @@ jobs:
         export PATH="$current_path:$PATH"
         echo $PATH
         veracode version
+        echo "cli-path=$current_path" >> $GITHUB_OUTPUT
 
     - uses: actions/checkout@v4
       with:
@@ -66,11 +68,9 @@ jobs:
           FIX_SCA_BACKEND_URL: 'api-agora-stage-107.stage.veracode.io'
           VERACODE_API_KEY_ID: '${{ secrets.VERACODE_API_ID }}'
           VERACODE_API_KEY_SECRET: '${{ secrets.VERACODE_API_KEY }}'
+          CLI_PATH: ${{ steps.cli-setup.outputs.cli-path }}
       with:
         github-token: ${{ github.event.client_payload.token }}
-        vid: ${{ secrets.VERACODE_API_ID }}
-        vkey: ${{ secrets.VERACODE_API_KEY }}
-
         pr-number: ${{ github.event.client_payload.issue_number }} 
         sca-scan-run-id: ${{ github.event.client_payload.workflow_run_id }} 
         sca-scan-artifact-id: ${{ github.event.client_payload.artifact_id }} 
