@@ -8,7 +8,7 @@ on:
 jobs:
 
   fix-for-sca-action:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.client_payload.user_config.default_runs_on }}
     steps:
     - name: Download SCA scan artifact
       uses: actions/download-artifact@v5
