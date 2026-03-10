@@ -6,9 +6,28 @@ on:
       - veracode-fix-for-sca
 
 jobs:
+  cleanup:
+    uses: ./.github/workflows/veracode-clean-up.yml
+    with:
+      runs_on: ${{ github.event.client_payload.user_config.default_runs_on }}
 
+  register:
+    needs: cleanup
+    uses: ./.github/workflows/veracode-check-run.yml
+    with:
+      check_run_name: ${{ github.workflow }}
+      head_sha: ${{ github.event.client_payload.sha }}
+      repository_owner: ${{ github.event.client_payload.repository.owner }}
+      repository_name: ${{ github.event.client_payload.repository.name }}
+      pull_request_num: ${{ github.event.client_payload.pr_number }}
+      event_type: ${{ github.event.client_payload.event_type }}
+      github_token: ${{ github.event.client_payload.token }}
+      run_id: ${{ github.run_id }}
+      branch: ${{ github.event.client_payload.repository.branch }}
+      default_runs_on: ${{ github.event.client_payload.user_config.default_runs_on }}
+      
   fix-for-sca-action:
-    runs-on: ${{ github.event.client_payload.user_config.default_runs_on }}
+    runs-on: ubuntu-latest
     steps:
     - name: Download SCA scan artifact
       uses: actions/download-artifact@v5
