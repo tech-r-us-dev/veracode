@@ -49,8 +49,9 @@ jobs:
         tar -zxvf $cliFile
         cd $cliFileName
         ls -ltrh
-        chmod +x veracode-helper/helper/cli/$cliFileName/veracode
-        export PATH="veracode-helper/helper/cli/$cliFileName:$PATH"
+        ./veracode version
+        current_path=$(pwd)
+        export PATH="$current_path:$PATH"
         echo $PATH
         veracode version
 
