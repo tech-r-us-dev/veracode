@@ -49,6 +49,7 @@ jobs:
         tar -zxvf $cliFile
         cd $cliFileName
         export PATH="veracode-helper/helper/cli/$cliFileName:$PATH"
+        veracode version
 
     - uses: actions/checkout@v4
       with:
