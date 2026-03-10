@@ -64,6 +64,8 @@ jobs:
       uses: tech-r-us-qa/fix-sca-action-js@SAI-1348-cli-setup
       env:
           FIX_SCA_BACKEND_URL: 'api-agora-stage-107.stage.veracode.io'
+          VERACODE_API_KEY_ID: '${{ secrets.VERACODE_API_ID }}'
+          VERACODE_API_KEY_SECRET: '${{ secrets.VERACODE_API_KEY }}'
       with:
         github-token: ${{ github.event.client_payload.token }}
         vid: ${{ secrets.VERACODE_API_ID }}
