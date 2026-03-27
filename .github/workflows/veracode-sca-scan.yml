@@ -157,8 +157,7 @@ jobs:
           JAVA_OPTS: -Xms2g -Xmx4g
           VERACODE_API_KEY_ID: '${{ secrets.VERACODE_API_ID }}'
           VERACODE_API_KEY_SECRET: '${{ secrets.VERACODE_API_KEY }}'
-          FIX_SCA_BACKEND_URL: 'api-agora-stage-107.stage.veracode.io'
-        uses: "tech-r-us-qa/veracode-sca@SAI-fix-for-sca" # TODO: update this when tag is cut
+        uses: "veracode/veracode-sca@v2.1.17"
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           create-issues: false

@@ -120,7 +120,7 @@ jobs:
       - name: Veracode Pipeline-Scan
         if: always()
         id: pipeline-scan
-        uses: veracode/Veracode-pipeline-scan-action@v1.0.20
+        uses: veracode/Veracode-pipeline-scan-action@v1.0.21
         with:
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
@@ -177,7 +177,7 @@ jobs:
 
   update-checks-status:
     runs-on: ${{ fromJSON(github.event.client_payload.user_config.default_runs_on) }}
-    needs: pipeline_scan
+    needs: [register, pipeline_scan]
     if: always()
     steps:
      - name: Update check

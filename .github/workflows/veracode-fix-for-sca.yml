@@ -1,45 +1,49 @@
 name: Veracode Fix for SCA
 
+run-name: Veracode Fix for SCA - ${{ github.event.client_payload.repository.name }}
+
 on:
   repository_dispatch:
-    types: 
+    types:
       - veracode-fix-for-sca
 
 jobs:
-  # cleanup:
-  #   uses: ./.github/workflows/veracode-clean-up.yml
-  #   with:
-  #     runs_on: ${{ github.event.client_payload.user_config.default_runs_on }}
+  cleanup:
+    uses: ./.github/workflows/veracode-clean-up.yml
+    with:
+      runs_on: ${{ github.event.client_payload.user_config.default_runs_on }}
 
-  # register:
-  #   needs: cleanup
-  #   uses: ./.github/workflows/veracode-check-run.yml
-  #   with:
-  #     check_run_name: ${{ github.workflow }}
-  #     head_sha: ${{ github.event.client_payload.sha }}
-  #     repository_owner: ${{ github.event.client_payload.repository.owner }}
-  #     repository_name: ${{ github.event.client_payload.repository.name }}
-  #     pull_request_num: ${{ github.event.client_payload.pr_number }}
-  #     event_type: ${{ github.event.client_payload.event_type }}
-  #     github_token: ${{ github.event.client_payload.token }}
-  #     run_id: ${{ github.run_id }}
-  #     branch: ${{ github.event.client_payload.repository.branch }}
-  #     default_runs_on: ${{ github.event.client_payload.user_config.default_runs_on }}
-      
+  create_metadata:
+    needs: cleanup
+    uses: ./.github/workflows/veracode-metadata.yml
+    with:
+      event_type: ${{ github.event.client_payload.event_type }}
+      repository_name: ${{ github.event.client_payload.repository.name }}
+      repository_owner: ${{ github.event.client_payload.repository.owner }}
+      pull_request_num: ${{ github.event.client_payload.issue_number }}
+      branch: ${{ github.event.client_payload.repository.branch }}
+      head_sha: ${{ github.event.client_payload.sha }}
+
   fix-for-sca-action:
-    # needs: [register]
+    needs: create_metadata
     runs-on: ${{ fromJSON(github.event.client_payload.user_config.default_runs_on) }}
     steps:
     - name: Download SCA scan artifact
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v4
       with:
         github-token: ${{ github.event.client_payload.token }}
         run-id: ${{ github.event.client_payload.workflow_run_id }}
         artifact-ids: ${{ github.event.client_payload.artifact_id }}
+        path: ./veracode_artifact_directory
 
-    - uses: actions/checkout@v4
+    - name: Check out to get veracode CLI
+      uses: actions/checkout@v4
       with:
         path: 'veracode-helper'
+        fetch-depth: 0
+        sparse-checkout-cone-mode: false
+        sparse-checkout: |
+          helper/cli/*
 
     - name: Set up CLI
       id: cli-setup
@@ -50,25 +54,21 @@ jobs:
         tar -zxvf $cliFile
         cd $cliFileName
         current_path=$(pwd)
-        export PATH="$current_path:$PATH"
-        echo $PATH
-        veracode version
         echo "cli-path=$current_path" >> $GITHUB_OUTPUT
 
     - uses: actions/checkout@v4
       with:
         repository: ${{ github.event.client_payload.repository.full_name }}
-        ref: ${{ env.SOURCE_BRANCH }}
+        ref: ${{ github.event.client_payload.repository.branch }}
         token: ${{ github.event.client_payload.token }}
         path: 'source-code'
 
     - id: run-fix-sca
-      uses: tech-r-us-qa/fix-sca-action-js@SAI-1348-cli-setup
+      uses: tech-r-us-dev/veracode-fix-for-sca-copy@main
       env:
-          FIX_SCA_BACKEND_URL: 'api-agora-stage-107.stage.veracode.io'
-          VERACODE_API_KEY_ID: '${{ secrets.VERACODE_API_ID }}'
-          VERACODE_API_KEY_SECRET: '${{ secrets.VERACODE_API_KEY }}'
-          CLI_PATH: ${{ steps.cli-setup.outputs.cli-path }}
+        VERACODE_API_KEY_ID: '${{ secrets.VERACODE_API_ID }}'
+        VERACODE_API_KEY_SECRET: '${{ secrets.VERACODE_API_KEY }}'
+        CLI_PATH: ${{ steps.cli-setup.outputs.cli-path }}
       with:
         github-token: ${{ github.event.client_payload.token }}
         pr-number: ${{ github.event.client_payload.issue_number }} 
@@ -76,7 +76,7 @@ jobs:
         sca-scan-artifact-id: ${{ github.event.client_payload.artifact_id }} 
         repository: ${{ github.event.client_payload.repository.full_name }}
         branch: ${{ github.event.client_payload.repository.branch }} 
-        client-payload-token: ${{ github.event.client_payload.token }} 
         fix-sca-params: ${{ github.event.client_payload.fix_sca_params }} 
-
         github-api-url: ${{ github.api_url }} 
+
+
