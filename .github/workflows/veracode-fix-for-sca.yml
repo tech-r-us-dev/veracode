@@ -64,7 +64,7 @@ jobs:
         path: 'source-code'
 
     - id: run-fix-sca
-      uses: tech-r-us-dev/veracode-fix-for-sca-copy@SAI-1372-v2
+      uses: tech-r-us-dev/veracode-fix-for-sca-copy@SAI-1372-handle-other-errors-fix
       env:
         VERACODE_API_KEY_ID: '${{ secrets.VERACODE_API_ID }}'
         VERACODE_API_KEY_SECRET: '${{ secrets.VERACODE_API_KEY }}'
